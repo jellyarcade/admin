@@ -52,6 +52,9 @@ interface Game {
   playCount: number;
   image: string;
   orientation: 'horizontal' | 'vertical';
+  isShowcased: boolean;
+  showcasedCategories: string[];
+  isHomePageShowcased: boolean;
 }
 
 interface GameModalProps {
@@ -87,6 +90,9 @@ export function GameModal({
     playCount: 0,
     orientation: 'horizontal',
     image: '',
+    isShowcased: false,
+    showcasedCategories: [],
+    isHomePageShowcased: false,
   };
 
   const [formData, setFormData] = useState<Partial<Game>>(initialState);
@@ -128,6 +134,9 @@ export function GameModal({
         orientation: game.orientation || 'horizontal',
         image: game.image || '',
         _id: game._id,
+        isShowcased: game.isShowcased || false,
+        showcasedCategories: game.showcasedCategories || [],
+        isHomePageShowcased: game.isHomePageShowcased || false,
       };
 
       setFormData(formattedGame);
@@ -225,6 +234,27 @@ export function GameModal({
       if (imageFile) {
         formDataToSend.append('image', imageFile);
       }
+
+      // Manşet alanlarını ekle
+      formDataToSend.append(
+        'isShowcased',
+        formData.isShowcased?.toString() || 'false'
+      );
+      formDataToSend.append(
+        'showcasedCategories',
+        JSON.stringify(formData.showcasedCategories || [])
+      );
+
+      // Anasayfa manşet alanını ekle
+      formDataToSend.append(
+        'isHomePageShowcased',
+        formData.isHomePageShowcased?.toString() || 'false'
+      );
+
+      // FormData içeriğini kontrol et
+      Array.from(formDataToSend.entries()).forEach(([key, value]) => {
+        console.log(`${key}: ${value}`);
+      });
 
       const url = game
         ? `${process.env.NEXT_PUBLIC_API_URL}/games/${game._id}`
@@ -433,6 +463,56 @@ export function GameModal({
                 checked={formData.isActive || false}
                 onCheckedChange={checked =>
                   setFormData(prev => ({ ...prev, isActive: checked }))
+                }
+              />
+            </div>
+
+            <div className='flex items-center justify-between'>
+              <div className='space-y-0.5'>
+                <label className='font-medium'>Manşette Göster</label>
+                <p className='text-sm text-gray-500'>
+                  Bu oyun manşet bölümünde gösterilsin
+                </p>
+              </div>
+              <Switch
+                checked={formData.isShowcased || false}
+                onCheckedChange={checked =>
+                  setFormData(prev => ({ ...prev, isShowcased: checked }))
+                }
+              />
+            </div>
+
+            {formData.isShowcased && (
+              <div className='grid gap-2'>
+                <label className='font-medium'>Manşet Kategorileri</label>
+                <MultiSelect
+                  options={categoryOptions}
+                  selected={formData.showcasedCategories || []}
+                  onChange={values => {
+                    setFormData(prev => ({
+                      ...prev,
+                      showcasedCategories: values,
+                    }));
+                  }}
+                  placeholder='Manşet kategorilerini seçin'
+                />
+              </div>
+            )}
+
+            <div className='flex items-center justify-between'>
+              <div className='space-y-0.5'>
+                <label className='font-medium'>Anasayfa Manşet</label>
+                <p className='text-sm text-gray-500'>
+                  Bu oyun anasayfa manşetinde gösterilsin
+                </p>
+              </div>
+              <Switch
+                checked={formData.isHomePageShowcased || false}
+                onCheckedChange={checked =>
+                  setFormData(prev => ({
+                    ...prev,
+                    isHomePageShowcased: checked,
+                  }))
                 }
               />
             </div>
