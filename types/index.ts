@@ -24,6 +24,8 @@ export interface Game {
   orientation: 'horizontal' | 'vertical';
   createdAt: string;
   updatedAt: string;
+  showcasedCategories: string[];
+  isHomePageShowcased: boolean;
 }
 
 export interface Category {
