@@ -55,6 +55,7 @@ interface Game {
   isShowcased: boolean;
   showcasedCategories: string[];
   isHomePageShowcased: boolean;
+  devices: string[];
 }
 
 interface GameModalProps {
@@ -77,7 +78,7 @@ export function GameModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   console.log('Modal Props:', { isOpen, game });
-
+	
   const initialState: Partial<Game> = {
     title: { tr: '', en: '' },
     description: { tr: '', en: '' },
@@ -93,6 +94,7 @@ export function GameModal({
     isShowcased: false,
     showcasedCategories: [],
     isHomePageShowcased: false,
+	devices: ['all'],
   };
 
   const [formData, setFormData] = useState<Partial<Game>>(initialState);
@@ -137,6 +139,7 @@ export function GameModal({
         isShowcased: game.isShowcased || false,
         showcasedCategories: game.showcasedCategories || [],
         isHomePageShowcased: game.isHomePageShowcased || false,
+		devices: game.devices || ['all']
       };
 
       setFormData(formattedGame);
@@ -207,7 +210,9 @@ export function GameModal({
       } else {
         throw new Error('En az bir kategori seçilmelidir');
       }
-
+		
+		formDataToSend.append('devices', JSON.stringify(formData.devices || ['all']));
+		
       // Anahtar kelimeler
       formDataToSend.append(
         'keywords.tr',
@@ -293,6 +298,13 @@ export function GameModal({
     value: cat._id,
     label: cat.name.tr,
   }));
+  
+  const deviceOptions = [
+  { value: 'all', label: 'Tüm Cihazlar' },
+  { value: 'ios', label: 'iOS (iPhone/iPad)' },
+  { value: 'android', label: 'Android' },
+  { value: 'web', label: 'Web (Masaüstü)' },
+];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -517,6 +529,28 @@ export function GameModal({
               />
             </div>
           </div>
+		  
+		  <div className='grid gap-2'>
+          <label className='font-medium'>Gösterilecek Cihazlar</label>
+          <MultiSelect
+            options={deviceOptions}
+            selected={formData.devices || ['all']}
+            onChange={values => {
+              // Eğer 'all' seçiliyse diğer seçimleri temizle
+              const hasAll = values.includes('all');
+              const newValues = hasAll ? ['all'] : values;
+              
+              setFormData(prev => ({
+                ...prev,
+                devices: newValues,
+              }));
+            }}
+            placeholder='Cihazları seçin'
+          />
+          <p className='text-sm text-gray-500'>
+            Bu oyunun hangi cihazlarda görüneceğini seçin. "Tüm Cihazlar" seçiliyse diğer seçimler geçersiz olur.
+          </p>
+        </div>
 
           <div className='grid gap-4'>
             <h3 className='font-medium'>SEO Bilgileri</h3>
