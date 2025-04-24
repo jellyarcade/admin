@@ -55,7 +55,7 @@ interface Game {
   isShowcased: boolean;
   showcasedCategories: string[];
   isHomePageShowcased: boolean;
-  devices: string[];
+  devices?: string[];
 }
 
 interface GameModalProps {
