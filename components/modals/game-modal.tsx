@@ -302,6 +302,7 @@ export function GameModal({
   const deviceOptions = [
   { value: 'all', label: 'Tüm Cihazlar' },
   { value: 'ios', label: 'iOS (iPhone/iPad)' },
+  { value: 'macos', label: 'MacOs' },
   { value: 'android', label: 'Android' },
   { value: 'web', label: 'Web (Masaüstü)' },
 ];
